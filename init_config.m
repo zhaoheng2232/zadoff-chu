@@ -2,13 +2,14 @@ function [ simCfg,rfCfg,nodeCfg,algCfg,frameCfg ] = init_config()
 
 % ---------- Configure simulation parameters
 simCfg.conopsId = 1;
-simCfg.topologyType = 'packedCircle';
+simCfg.topologyType = 'onCircle';
 simCfg.numLink = 3;
-simCfg.areaRadiusM = 2900;
-simCfg.maxTxRxDistM = 500;
-simCfg.minTxRxDistM = 500;
+simCfg.areaRadiusM = 20;
+simCfg.maxTxRxDistM = 20;
+simCfg.minTxRxDistM = 20;
 simCfg.maxSpeedMph = 0;
-simCfg.fadingType = 'Rayleigh';
+simCfg.fadingType = 'Rician';
+simCfg.fadingKFactor = 3;
 simCfg.numMultipath = 1;
 simCfg.runDetectAlg = 1;
 simCfg.maxTxRange = 1000;%2900;%10^((nodeCfg.maxTxPowDbm+2*2 + rfCfg.pathloss1m - rfCfg.noiseFloorDbm)/(10*rfCfg.plExponent));
@@ -21,12 +22,12 @@ rfCfg.plExponent = 3.8;
 rfCfg.pathloss1m = 20*log10( 3e8/rfCfg.fcHz/4/pi/1 ); %1m loss
 rfCfg.nfDb = 3;
 rfCfg.anteGainDbi = 2;
-rfCfg.noiseFloorDbm = -113 + rfCfg.nfDb+10*log10(rfCfg.bwHz); %dBm
+rfCfg.noiseFloorDbm = -174 + rfCfg.nfDb+10*log10(rfCfg.bwHz); %dBm
 
 % ---------- Configure node parameters
 nodeCfg.numTx = 4;
 nodeCfg.numRx = 4;
-nodeCfg.maxTxPowDbm = 40;
+nodeCfg.maxTxPowDbm = 80;
 nodeCfg.minTxPowDbm = -20;
 nodeCfg.ctrlPwrDbGrid1 = -9:3:0;
 nodeCfg.ctrlPwrDbGrid2 = -2:1;
@@ -56,11 +57,12 @@ minSnr = db2pow(min(algCfg.snrThrsDb));
 algCfg.ctTrainSlot = minSnr/(1+minSnr); %countdown threshold in the training slot
 
 % ---------- Configure Frame parameters
-frameCfg.numFrame = 10;
+frameCfg.numFrame = 0;
 frameCfg.numIniSlot = 10;
-frameCfg.epochLen = 550;%250;%;1050;%500;
+frameCfg.epochLen = 550*2;%250;%;1050;%500;
 frameCfg.syncSeqLen = 509;%229;%1021;%479;
-frameCfg.syncSeqCpLen = frameCfg.epochLen-frameCfg.syncSeqLen;
+frameCfg.syncSeqRateSet = primes(frameCfg.syncSeqLen);
+frameCfg.syncSeqCpLen = frameCfg.epochLen/2-frameCfg.syncSeqLen;
 frameCfg.epch1LenUs = frameCfg.epochLen/rfCfg.bwHz*1e6;
 frameCfg.epch2LenUs = frameCfg.epch1LenUs;
 frameCfg.timeGapUs = 100;
